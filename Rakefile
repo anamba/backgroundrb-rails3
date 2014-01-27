@@ -1,7 +1,7 @@
 require 'rake'
 require 'rubygems'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rdoc/task'
 #require 'spec/rake/spectask'
 #require 'rspec_helper'
 require 'rspec/core/rake_task'
@@ -116,7 +116,7 @@ end
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   gem.name = "backgroundrb-rails3"
-  gem.homepage = "http://github.com/mtylty/backgroundrb-rails3"
+  gem.homepage = "http://github.com/anamba/backgroundrb-rails3"
   gem.license = "MIT"
   gem.summary = %Q{BackgrounDRb is a Ruby job server and scheduler.}
   gem.description = %Q{
@@ -124,8 +124,8 @@ Jeweler::Tasks.new do |gem|
     Since a Rails application blocks while serving a request it is best to move long-running tasks off into a background process that is divorced from http request/response cycle.
     This is the RoR 3 version (Railtie based) of the gem. Please read the GitHub homepage for installation instructions.
   }
-  gem.email = "mtylty@gmail.com"
-  gem.authors = ["Matteo Latini"]
-  gem.version = "1.1.6"
+  gem.email = "aaron@biggerbird.com"
+  gem.authors = ["Matteo Latini", "Aaron Namba"]
+  gem.version = "1.1.7"
 end
 Jeweler::RubygemsDotOrgTasks.new
