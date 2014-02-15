@@ -24,7 +24,7 @@ module BackgrounDRb
     end
 
     def self.read_config(config_file)
-      config = YAML.load(ERB.new(IO.read(config_file)).result)
+      config = HashWithIndifferentAccess.new(YAML.load(ERB.new(IO.read(config_file)).result))
       environment = ENV["RAILS_ENV"] || config[:backgroundrb][:environment] || "development"
 
       if respond_to?(:silence_warnings)
