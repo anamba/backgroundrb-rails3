@@ -387,7 +387,7 @@ module BackgrounDRb
     # Periodic check for lost database connections and closed connections
     def check_db_connection
       begin
-        ActiveRecord::Base.verify_active_connections! if defined?(ActiveRecord)
+        ActiveRecord::Base.verify_active_connections! if defined?(ActiveRecord) && ActiveRecord::Base.respond_to?(:verify_active_connections!)
       rescue Object => bdrb_error
         log_exception(bdrb_error)
       end
