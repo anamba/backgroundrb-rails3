@@ -7,7 +7,7 @@ module BackgrounDRb
         puts "BackgrounDRb Already Running"
         exit(0)
       elsif dead? # dead, but pid exists
-        File.rm(PID_FILE)
+        File.unlink(PID_FILE)
       end
       
       # status == 3, not running.
@@ -26,14 +26,14 @@ module BackgrounDRb
         puts "BackgrounDRb Not Running"
       end
       
-      pid_files.each do |x|
-        begin
-          kill_process(x)
-        rescue Errno::ESRCH
-          # stopping an already stopped process is considered a success (exit status 0)
-        end
-      end
-      File.rm(PID_FILE) if pidfile_exists?
+      # pid_files.each do |x|
+      #   begin
+      #     kill_process(x)
+      #   rescue Errno::ESRCH
+      #     # stopping an already stopped process is considered a success (exit status 0)
+      #   end
+      # end
+      File.unlink(PID_FILE) if pidfile_exists?
     end
     
     # returns the correct lsb code for the status:
