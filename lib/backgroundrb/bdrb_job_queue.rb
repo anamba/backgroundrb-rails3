@@ -1,19 +1,17 @@
 # Model for storing jobs/tasks persisted to the database
 
 class BdrbJobQueue < ActiveRecord::Base
-  validates_uniqueness_of :job_key,:scope => [:worker_name,:worker_key]
+  validates_uniqueness_of :job_key, scope: [:worker_name, :worker_key]
+  
   # find next task from the table
   def self.find_next(worker_name,worker_key = nil)
     returned_job = nil
     ActiveRecord::Base.verify_active_connections! if ActiveRecord::Base.respond_to?(:verify_active_connections!)
     transaction do
-      unless worker_key
-        #use ruby time stamps for time calculations as db might have different times than what is calculated by ruby/rails
-        t_job = find(:first,:conditions => [" worker_name = ? AND taken = ? AND scheduled_at <= ? ", worker_name, 0, Time.now.utc ],:lock => true, :order => 'priority desc')
-      else
-        t_job = find(:first,:conditions => [" worker_name = ? AND taken = ? AND worker_key = ? AND scheduled_at <= ? ", worker_name, 0, worker_key, Time.now.utc ],:lock => true)
-      end
-      if t_job
+      #use ruby time stamps for time calculations as db might have different times than what is calculated by ruby/rails
+      query = where(worker_name: worker_name, taken: 0).where("scheduled_at <= ?", Time.now.utc).lock(true).order('priority desc')
+      query = query.where(worker_key: worker_key) if worker_key
+      if t_job = query.first
         t_job.taken = 1
         t_job.started_at = Time.now.utc
         t_job.save
@@ -47,7 +45,7 @@ class BdrbJobQueue < ActiveRecord::Base
   def self.insert_job(options = { })
     ActiveRecord::Base.verify_active_connections! if ActiveRecord::Base.respond_to?(:verify_active_connections!)
     transaction do
-      options.merge!(:submitted_at => Time.now.utc,:finished => 0,:taken => 0)
+      options.merge!(submitted_at: Time.now.utc, finished: 0, taken: 0)
       t_job = new(options)
       t_job.save
     end
@@ -57,7 +55,7 @@ class BdrbJobQueue < ActiveRecord::Base
   def self.remove_job(options = { })
     ActiveRecord::Base.verify_active_connections! if ActiveRecord::Base.respond_to?(:verify_active_connections!)
     transaction do
-      t_job_id = find(:first, :conditions => options.merge(:finished => 0,:taken => 0),:lock => true)
+      t_job_id = where(options.merge(finished: 0, taken: 0)).lock(true).first
       delete(t_job_id)
     end
   end
